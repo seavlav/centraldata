@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ subcategory }} Datasets</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header>
+  <h1>{{ subcategory }}</h1>
+  <a href="{{ request.referrer }}">← Back</a>
+</header>
+
+<main>
+  {% for ds in datasets %}
+  <div class="dataset-card">
+    <div class="icon">📄</div>
+    <h3>{{ ds.name }}</h3>
+    <p>Type: {{ ds.type }}</p>
+    <button class="preview-btn" data-file="{{ ds.filename }}">Preview</button>
+    <a href="{{ url_for('download_dataset', filename=ds.filename) }}" class="download-btn">Download</a>
+    <div class="preview-table hidden" id="preview-{{ ds.filename }}"></div>
+  </div>
+  {% endfor %}
+</main>
+
+<script>
+document.querySelectorAll('.preview-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const filename = btn.dataset.file;
+    const tableDiv = document.getElementById(`preview-${filename}`);
+    const res = await fetch(`/preview/${filename}`);
+    const data = await res.json();
+
+    if(data.error){
+      tableDiv.innerHTML = `<p>${data.error}</p>`;
+    } else {
+      let html = '<table><tr>';
+      data.headers.forEach(h => html += `<th>${h}</th>`);
+      html += '</tr>';
+      data.rows.forEach(row => {
+        html += '<tr>';
+        data.headers.forEach(h => html += `<td>${row[h]}</td>`);
+        html += '</tr>';
+      });
+      html += '</table>';
+      tableDiv.innerHTML = html;
+    }
+    tableDiv.classList.toggle('hidden');
+  });
+});
+</script>
+</body>
+</html>

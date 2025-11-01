@@ -1,0 +1,201 @@
+body {
+    font-family: 'Inter', 'Segoe UI', sans-serif; /* Modern Font */
+    background: #f4f7f6; /* Light, soft background */
+    color: #1a202c; /* Dark text for readability */
+    margin: 0;
+    padding: 20px;
+}
+
+header {
+    position: relative;
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Subtle shadow */
+}
+
+h1 {
+    color: #004d99; /* Deep blue primary color */
+    font-weight: 600;
+}
+
+a {
+    text-decoration: none;
+    color: #004d99;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Back Button Style */
+header a {
+  position: absolute;
+  left: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  text-decoration: none;
+  color: #1a202c;
+}
+
+
+header a:hover {
+    color: #004d99;
+    text-decoration: none;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Apply the grid display to both sections */
+.categories, .subcategories {
+    display: grid;
+    gap: 20px;
+}
+
+/* Enforce 3 columns for Categories only */
+.categories {
+    /* Repeats the column definition three times, each taking an equal fraction of space (1fr) */
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Keep Subcategories responsive with a minimum width */
+.subcategories {
+    /* This allows the subcategories to adjust based on screen size (e.g., more than 3 on wide screens) */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.category-card, .subcategory-card, .dataset-card {
+    border: none;
+    padding: 25px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.category-card:hover, .subcategory-card:hover, .dataset-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #007bff; /* Accent color */
+}
+
+h2, h3, h4 {
+    margin-top: 5px;
+    color: #333;
+}
+
+/* Update the dataset-card to be more compact */
+.dataset-card {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    /* Reduced padding slightly for a tighter feel */
+    padding: 20px; 
+    gap: 10px; /* Significantly reduced space between elements (icon, title, file type) */
+}
+
+/* Reduced margin for the title and file type for compactness */
+.dataset-card h3 {
+    font-size: 1.25rem;
+    color: #004d99;
+    margin-top: 0; /* Remove top margin from title */
+    margin-bottom: 5px; /* Small gap after title */
+}
+
+/* Reduced margin for the File Type paragraph */
+.dataset-card p {
+    margin: 0 0 5px 0; /* Minimal margin above and below */
+}
+
+/* Reduce the margin below the icon */
+.icon {
+    font-size: 2.5rem;
+    margin-bottom: 5px; /* Reduced from 10px */
+    color: #007bff;
+}
+
+/* Slightly adjust the button area */
+.dataset-actions {
+    margin-top: 5px; /* Reduced from 'auto' for tighter spacing */
+}
+
+.dataset-actions {
+    margin-top: auto; /* Push buttons to the bottom */
+}
+
+button, .download-btn {
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    margin: 5px 0;
+    transition: background 0.2s;
+    font-weight: 500;
+}
+
+.preview-btn {
+    background: #5a7796; /* Secondary color for action */
+    color: white;
+}
+
+.preview-btn:hover {
+    background: #4a6685;
+}
+
+.download-btn {
+    background: #28a745; /* Green for download (Success) */
+    color: white;
+    text-decoration: none;
+}
+
+.download-btn:hover {
+    background: #1e7e34;
+}
+
+/* Keep table within its container and refine spacing */
+.dataset-info table {
+    /* Use fixed layout to handle column widths better */
+    table-layout: fixed; 
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.85rem;
+}
+
+/* Focus on cell padding for better density */
+.dataset-info th, .dataset-info td {
+    border: 1px solid #b3d7ff;
+    padding: 5px 8px; /* Reduced vertical padding */
+    text-align: left;
+    /* Prevent content from wrapping too aggressively, use an ellipsis if needed */
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    max-width: 150px; /* Set a max width for data cells to enforce 'ellipsis' if needed */
+}
+
+.dataset-info th {
+    background: #007bff;
+    color: white;
+    font-weight: 600;
+}
+
+/* Add horizontal scrolling for when the table is too wide */
+#sampleTable-{{ ds.filename }} {
+    overflow-x: auto;
+}
+
+.hidden {
+    display: none !important;
+}

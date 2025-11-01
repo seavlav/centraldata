@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ subcategory }} Datasets</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header>
+  <h1>{{ subcategory }} Datasets</h1>
+  <a href="{{ request.referrer }}">← Back to Category</a>
+</header>
+
+<main>
+    <section class="datasets">
+     {% for ds in datasets %}
+    <div class="dataset-card">
+     <div class="icon">
+       {% if ds.type == 'CSV' %}📄{% elif ds.type == 'ZIP' %}📦{% elif ds.type == 'XLSX' %}📉{% else %}❓{% endif %}
+     </div>
+     <h3>{{ ds.name }}</h3>
+     <p><strong>File Type:</strong> {{ ds.type }}</p>
+
+     <div class="dataset-actions">
+       <button class="preview-btn" data-file="{{ ds.filename }}">View Info / Preview</button>
+       <a href="{{ url_for('download_dataset', filename=ds.filename) }}" class="download-btn">Download ({{ ds.type }})</a>
+     </div>
+
+     <div class="dataset-info hidden" id="info-{{ ds.filename }}"></div>
+    </div>
+     {% endfor %}
+  </section>
+</main>
+
+<script>
+document.querySelectorAll('.preview-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const filename = btn.dataset.file;
+    const infoDiv = document.getElementById(`info-${filename}`);
+
+    // If already visible, hide it and stop
+    if (!infoDiv.classList.contains('hidden')) {
+      infoDiv.classList.add('hidden');
+      return;
+    }
+
+    try {
+      const res = await fetch(`/preview/${filename}`);
+      if (!res.ok) throw new Error("Failed to fetch dataset preview.");
+      const data = await res.json();
+
+      const info = data.info || {};
+      const sample = data.sample || [];
+      const error = data.error;
+
+      // Clear any previous content
+      infoDiv.innerHTML = '';
+
+      if (error) {
+        infoDiv.innerHTML = `<p style="color: red; font-weight: bold;">⚠️ Error: ${error}</p>`;
+      } else {
+        // --- Build the dynamic HTML content ---
+        let contentHtml = `
+          <h3>${info.title || filename}</h3>
+          <p>${info.description || "No description available."}</p>
+          <p><strong>Size:</strong> <span>${info.size || "N/A"}</span></p>
+          <p><strong>Source:</strong> <span>${info.source || "N/A"}</span></p>
+        `;
+
+        // ✨ NEW: Check for a preview image and add it
+        if (info.preview_image_url) {
+            contentHtml += `
+                <h4>Data Preview:</h4>
+                <img src="${info.preview_image_url}" alt="Data preview for ${info.title}" style="max-width: 100%; height: auto; border-radius: 5px; margin-top: 10px; border: 1px solid #ddd;">
+            `;
+        }
+        
+        // Populate columns if they exist
+        if (info.columns && Object.keys(info.columns).length > 0) {
+          contentHtml += '<h4>Columns:</h4><ul style="margin-bottom: 20px;">';
+          for(const col in info.columns) {
+            contentHtml += `<li><strong>${col}</strong>: ${info.columns[col]}</li>`;
+          }
+          contentHtml += '</ul>';
+        }
+
+        // Populate sample data table if it exists
+        if (sample.length > 0) {
+          contentHtml += '<h4>Sample Data (First 5 Rows):</h4>';
+          let tableHtml = "<table><thead><tr>";
+          const headers = Object.keys(sample[0]);
+          headers.forEach(h => tableHtml += `<th>${h}</th>`);
+          tableHtml += "</tr></thead><tbody>";
+          sample.forEach(row => {
+            tableHtml += "<tr>";
+            headers.forEach(h => tableHtml += `<td>${row[h] || ''}</td>`);
+            tableHtml += "</tr>";
+          });
+          tableHtml += "</tbody></table>";
+          contentHtml += `<div class="sample-table-wrapper">${tableHtml}</div>`;
+        }
+        
+        infoDiv.innerHTML = contentHtml;
+      }
+
+      // Display the information panel
+      infoDiv.classList.remove('hidden');
+
+    } catch (e) {
+      console.error(e);
+      infoDiv.innerHTML = `<p style="color: red;">An unexpected error occurred while loading the preview.</p>`;
+      infoDiv.classList.remove('hidden');
+    }
+  });
+});
+</script>
+</body>
+</html>
